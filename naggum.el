@@ -39,7 +39,8 @@
 
 ;;; Code:
 
-;;;#autoload
+;;;###autoload
 (defun naggum ()
+  "Show a random Naggum post."
   (interactive)
   (browse-url "http://xach.com/naggum/articles/random"))
