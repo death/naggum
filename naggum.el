@@ -44,3 +44,5 @@
   "Show a random Naggum post."
   (interactive)
   (browse-url "http://xach.com/naggum/articles/random"))
+
+(provide 'naggum)
