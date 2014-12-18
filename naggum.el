@@ -46,3 +46,5 @@
   (browse-url "http://xach.com/naggum/articles/random"))
 
 (provide 'naggum)
+
+;;; naggum.el ends here
