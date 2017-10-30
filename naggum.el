@@ -43,7 +43,7 @@
 (defun naggum ()
   "Show a random Naggum post."
   (interactive)
-  (browse-url "http://xach.com/naggum/articles/random"))
+  (browse-url "https://xach.com/naggum/articles/random"))
 
 (provide 'naggum)
 
