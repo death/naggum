@@ -1,10 +1,11 @@
 ;;; naggum.el --- Show a random Naggum post
 
 ;; Author: death <github.com/death>
-;; Version: 1.0
-;; Package-Requires: ()
-;; Keywords: entertainment
+;; Version: 1.1
+;; Package-Requires: ((emacs "24.4"))
+;; Keywords: games help
 ;; URL: http://github.com/death/naggum
+;; SPDX-License-Identifier: MIT
 
 ;; This file is not part of GNU Emacs.
 
@@ -32,18 +33,48 @@
 
 ;;; Commentary:
 
-;; This package provides an interactive command to browse a random
-;; post from Zach Beane's Erik Naggum comp.lang.lisp archive.
+;; This package provides an interactive command to show a random post
+;; from Zach Beane's Erik Naggum comp.lang.lisp archive.
 
 ;; Just `M-x naggum` any time you get nostalgic.
 
 ;;; Code:
 
+(require 'subr-x)  ; For string-trim.
+(require 'url)
+(require 'xml)
+
+(defun naggum-string ()
+  "Get a random Naggum post as a string."
+  (with-temp-buffer
+    (let ((url-user-agent "naggum.el"))
+      (url-insert-file-contents "https://xach.com/naggum/articles/random"))
+    ;; Keep only the part between <pre>...</pre>.
+    (re-search-forward "<pre>")
+    (delete-region (point-min) (match-end 0))
+    (re-search-forward "</pre>")
+    (delete-region (match-beginning 0) (point-max))
+    ;; Remove all HTML tags (but keep the text in their bodies).
+    (goto-char (point-min))
+    (while (re-search-forward "<[^<>]*>" nil t) (replace-match ""))
+    ;; Expand &lt; and &gt; HTML entities.
+    (goto-char (point-min))
+    (xml-parse-string)
+    (concat (string-trim (buffer-string)) "\n")))
+
 ;;;###autoload
 (defun naggum ()
   "Show a random Naggum post."
   (interactive)
-  (browse-url "https://xach.com/naggum/articles/random"))
+  (let ((string (naggum-string)))
+    (with-current-buffer (get-buffer-create "*Naggum*")
+      (let ((inhibit-read-only t))
+        (erase-buffer)
+        (insert string))
+      (goto-char (point-min))
+      (mail-mode)
+      (view-mode)
+      (display-buffer (current-buffer)))))
 
 (provide 'naggum)
 
